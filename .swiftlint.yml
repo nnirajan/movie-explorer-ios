@@ -1,0 +1,8 @@
+disabled_rules:
+- trailing_whitespace
+
+excluded:
+- Generated
+- fastlane
+- build
+- vendor

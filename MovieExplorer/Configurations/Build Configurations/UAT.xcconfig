@@ -1,0 +1,13 @@
+//
+//  Dev.xcconfig
+//  MovieExplorer
+//
+//  Created by Nirajan Shrestha on 21/01/2026.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+
+#include "Base.xcconfig"
+
+TARGET_NAME = Movie Explorer UAT
