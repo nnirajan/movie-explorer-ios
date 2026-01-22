@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Network Error
 enum NetworkError: Error {
-	case invalidURL
+	case invalidURL(urlString: String)
 	case invalidResponse
 	case httpError(statusCode: Int, data: Data?)
 	case decodingError(Error)

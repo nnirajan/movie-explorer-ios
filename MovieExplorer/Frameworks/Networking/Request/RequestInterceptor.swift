@@ -51,3 +51,17 @@ final class LoggingInterceptor: RequestInterceptor {
 		}
 	}
 }
+
+// MARK: - Analytics Interceptor
+final class AnalyticsInterceptor: RequestInterceptor {
+	func intercept(_ request: URLRequest, response: HTTPURLResponse?, data: Data?, error: Error?) async throws {
+		// Track API calls for analytics
+		if let error = error {
+			// Log error to analytics service
+			print("📊 Analytics: API Error - \(request.url?.path ?? "")")
+		} else if let statusCode = response?.statusCode {
+			// Log successful request
+			print("📊 Analytics: API Success - \(request.url?.path ?? "") - \(statusCode)")
+		}
+	}
+}

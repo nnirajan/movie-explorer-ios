@@ -11,3 +11,4 @@
 #include "Base.xcconfig"
 
 TARGET_NAME = Movie Explorer Dev
+APP_ENV = DEV

@@ -10,4 +10,5 @@
 
 #include "../Secrets/Secrets.xcconfig"
 
-BASE_URL = https:/$()/
+BASE_URL = https:/$()/api.themoviedb.org/
+VERSION = 3

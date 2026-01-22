@@ -17,7 +17,7 @@ final class RequestBuilder {
 	
 	func build(from request: NetworkRequest, defaultHeaders: HTTPHeaders) throws -> URLRequest {
 		guard let url = URL(string: request.path, relativeTo: baseURL) else {
-			throw NetworkError.invalidURL
+			throw NetworkError.invalidURL(urlString: request.path)
 		}
 		
 		var urlRequest = URLRequest(url: url)

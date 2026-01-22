@@ -49,39 +49,45 @@ final class NetworkClient: NetworkClientProtocol {
 	}
 	
 	private func executeWithRetry(_ request: URLRequest, retryCount: Int) async throws -> Data {
+		var httpResponse: HTTPURLResponse?
+		var responseData: Data?
+
 		do {
 			let (data, response) = try await configuration.session.data(for: request)
-			
-			guard let httpResponse = response as? HTTPURLResponse else {
+			responseData = data
+
+			guard let validResponse = response as? HTTPURLResponse else {
 				throw NetworkError.invalidResponse
 			}
-			
+
+			httpResponse = validResponse
+
 			// Validate response
 			if let validator = configuration.validator {
-				try validator.validate(request: request, response: httpResponse, data: data)
+				try validator.validate(request: request, response: validResponse, data: data)
 			} else {
-				try defaultValidation(response: httpResponse, data: data)
+				try defaultValidation(response: validResponse, data: data)
 			}
-			
+
 			// Call interceptors on success
-			try await applyInterceptors(request: request, response: httpResponse, data: data, error: nil)
-			
+			try await applyInterceptors(request: request, response: validResponse, data: data, error: nil)
+
 			return data
-			
+
 		} catch {
 			// Call interceptors on error
-			try await applyInterceptors(request: request, response: nil, data: nil, error: error)
-			
+			try await applyInterceptors(request: request, response: httpResponse, data: responseData, error: error)
+
 			// Check if should retry
 			if let retrier = configuration.retrier,
-			   await retrier.shouldRetry(request: request, response: nil, error: error, retryCount: retryCount) {
+			   await retrier.shouldRetry(request: request, response: httpResponse, error: error, retryCount: retryCount) {
 				return try await executeWithRetry(request, retryCount: retryCount + 1)
 			}
-			
+
 			throw error
 		}
 	}
-	
+
 	private func applyAdapters(to request: URLRequest) async throws -> URLRequest {
 		var urlRequest = request
 		
