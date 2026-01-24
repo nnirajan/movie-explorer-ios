@@ -1,5 +1,5 @@
 //
-//  RatingView.swift
+//  Untitled.swift
 //  MovieExplorer
 //
 //  Created by Nirajan Shrestha on 24/01/2026.
@@ -7,22 +7,22 @@
 
 import SwiftUI
 
-struct RatingView: View {
-	var rating: String
+struct RunTimeView: View {
+	var runtime: Int
 	
-    var body: some View {
+	var body: some View {
 		HStack(alignment: .center, spacing: 4) {
-			Image(systemName: "star.fill")
+			Image(systemName: "clock")
 				.resizable()
 				.frame(width: 16, height: 16)
 			
-			Text(rating)
+			Text("\(runtime) minutes")
 				.font(AppTypography.secondaryBody)
 		}
-		.foregroundStyle(.yellow)
-    }
+		.foregroundStyle(.secondary)
+	}
 }
 
 #Preview {
-	RatingView(rating: "4.5")
+	RunTimeView(runtime: 128)
 }

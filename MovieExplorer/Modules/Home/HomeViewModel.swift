@@ -11,6 +11,7 @@ import Foundation
 class HomeViewModel: BaseViewModel {
 	// MARK: - properties
 	private let movieRepository: MovieRepository
+	private let genreRepository: GenreRepository
 	
 	var genres: [Genre] = []
 	var nowPlayingMovies: [Movie] = []
@@ -24,8 +25,12 @@ class HomeViewModel: BaseViewModel {
 	}
 	
 	// MARK: - init
-	init(movieRepository: MovieRepository) {
+	init(
+		movieRepository: MovieRepository,
+		genreRepository: GenreRepository
+	) {
 		self.movieRepository = movieRepository
+		self.genreRepository = genreRepository
 		super.init()
 	}
 	
@@ -62,7 +67,7 @@ class HomeViewModel: BaseViewModel {
 	// MARK: - getGenres
 	@MainActor
 	func getGenres() async throws -> GenreReponse {
-		try await movieRepository.getGenres(request: MovieRequest.genre)
+		try await genreRepository.getGenres(request: GenreRequest.genre)
 	}
 	
 	// MARK: - getNowPlayingMovies

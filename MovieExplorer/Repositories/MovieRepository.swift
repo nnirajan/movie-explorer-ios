@@ -10,7 +10,8 @@ import Foundation
 protocol MovieRepository {
 	func getNowPlayingMovies(request: NetworkRequest) async throws -> MovieResponse
 	func getPopularMovies(request: NetworkRequest) async throws -> MovieResponse
-	func getGenres(request: NetworkRequest) async throws -> GenreReponse
+	func getMovieDetail(request: NetworkRequest) async throws -> Movie
+	func getCredits(request: NetworkRequest) async throws -> CastResponse
 }
 
 class MovieRepositoryImpl: MovieRepository {
@@ -34,11 +35,13 @@ class MovieRepositoryImpl: MovieRepository {
 		return try await networkClient.execute(request)
 	}
 	
-	// MARK: - getGenres
-	func getGenres(request: NetworkRequest) async throws -> GenreReponse {
+	// MARK: - getMovieDetail
+	func getMovieDetail(request: any NetworkRequest) async throws -> Movie {
 		return try await networkClient.execute(request)
-		
-//		let response: GenreResponse = try await networkClient.execute(request)
-//		return response.genres
+	}
+	
+	// MARK: - getMovieDetail
+	func getCredits(request: any NetworkRequest) async throws -> CastResponse {
+		return try await networkClient.execute(request)
 	}
 }

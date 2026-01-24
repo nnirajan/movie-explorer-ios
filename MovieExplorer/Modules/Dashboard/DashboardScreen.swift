@@ -29,6 +29,7 @@ enum DashboardTab: String {
 enum DashBoardRoute: Route {
 	case home
 	case favourites
+	case movieDetail(id: Int)
 
 	var id: String {
 		switch self {
@@ -36,6 +37,9 @@ enum DashBoardRoute: Route {
 			return "home"
 		case .favourites:
 			return "favourites"
+		case .movieDetail(let id):
+			return "detail_\(id)"
+			
 		}
 	}
 }
@@ -59,8 +63,12 @@ struct DashboardScreen: View {
 								viewModel: HomeViewModel(
 									movieRepository: MovieRepositoryImpl(
 										networkClient: AppDependencyContainer.shared.networkClient
+									),
+									genreRepository: GenreRepositoryImpl(
+										networkClient: AppDependencyContainer.shared.networkClient
 									)
-								)
+								),
+								router: dashboardRouter
 							)
 						}
 					)
@@ -76,11 +84,44 @@ struct DashboardScreen: View {
 				}
 			},
 			destination: { (route, router) in
-				
+				handleDashboardRoutes(for: route, router: router)
 			}
 		)
 		.navigationBarTitleDisplayMode(.inline)
 		
+	}
+	
+	@ViewBuilder
+	private func handleDashboardRoutes(for route: DashBoardRoute, router: Router<DashBoardRoute>) -> some View {
+		switch route {
+		case .home:
+			EmptyView()
+		case .favourites:
+			EmptyView()
+		case .movieDetail(let id):
+			DetailScreen(
+				viewModel: DetailViewModel(
+					movieID: id,
+					movieRepository: MovieRepositoryImpl(
+						networkClient: AppDependencyContainer.shared.networkClient
+					)
+				)
+			)
+		}
+	}
+	
+	
+	// MARK: - Home Destinations
+	@ViewBuilder
+	private func homeDestination(for route: HomeRoute, router: Router<HomeRoute>) -> some View {
+		switch route {
+		case .home:
+			HomeTabView(router: router)
+		case .detail(let id):
+			DetailView(id: id, router: router)
+		case .nestedDetail(let id, let subId):
+			NestedDetailView(id: id, subId: subId, router: router)
+		}
 	}
 }
 

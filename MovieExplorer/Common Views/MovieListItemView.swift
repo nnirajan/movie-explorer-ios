@@ -15,15 +15,14 @@ struct MovieListItemView: View {
 		HStack(alignment: .top, spacing: 12) {
 			CachedImageView(path: movie.posterPath)
 				.cornerRadius(8)
-				.frame(width: 80, height: 120)
+				.frame(width: 90, height: 140)
 			
 			VStack(alignment: .leading, spacing: 6) {
 				Text(movie.title)
 					.font(AppTypography.body)
 					.lineLimit(2)
 				
-				Text(movie.formattedReleaseDate)
-					.font(AppTypography.caption)
+				ReleaseDateView(releaseDate: movie.formattedReleaseDate)
 				
 				RatingView(rating: movie.formattedRating)
 				
@@ -35,13 +34,16 @@ struct MovieListItemView: View {
 					}
 				}
 			}
+			.padding(.vertical, 6)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
     }
 	
 	// MARK: - Helper computed property
 		private var movieGenres: [Genre] {
-			movie.genreIDS.compactMap { genreID in
+			guard let genreIDS = movie.genreIDS else { return [] }
+			
+			return genreIDS.compactMap { genreID in
 				genres.first { $0.id == genreID }
 			}
 		}
