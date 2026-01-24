@@ -28,11 +28,21 @@ final class LoggingInterceptor: RequestInterceptor {
 	
 	func intercept(_ request: URLRequest, response: HTTPURLResponse?, data: Data?, error: Error?) async throws {
 		if logLevel == .verbose || (logLevel == .info && error == nil) || (logLevel == .error && error != nil) {
-			print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 			print("📡 Request: \(request.httpMethod ?? "") \(request.url?.absoluteString ?? "")")
 			
 			if let headers = request.allHTTPHeaderFields, logLevel == .verbose {
-				print("📋 Headers: \(headers)")
+				var sanitizedHeaders = headers
+				if sanitizedHeaders["Authorization"] != nil {
+					sanitizedHeaders["Authorization"] = "Bearer ***"
+				}
+				
+				let formattedHeaders = sanitizedHeaders
+					.sorted(by: { $0.key < $1.key })
+					.map { "\"\($0.key)\": \"\($0.value)\"" }
+					.joined(separator: ", ")
+				
+				print("📋 Headers: [\(formattedHeaders)]")
 			}
 			
 			if let body = request.httpBody, logLevel == .verbose {
@@ -41,13 +51,24 @@ final class LoggingInterceptor: RequestInterceptor {
 			
 			if let response = response {
 				print("✅ Response: \(response.statusCode)")
+				
+				if let data = data, logLevel == .verbose {
+					if let jsonObject = try? JSONSerialization.jsonObject(with: data),
+					   let prettyData = try? JSONSerialization.data(
+						withJSONObject: jsonObject,
+						options: [.prettyPrinted, .sortedKeys]
+					   ),
+					   let prettyString = String(data: prettyData, encoding: .utf8) {
+						print("📥 Response Data:\n\(prettyString)")
+					} else {
+						print("📥 Response Data: \(String(data: data, encoding: .utf8) ?? "")")
+					}
+				}
 			}
 			
 			if let error = error {
 				print("❌ Error: \(error.localizedDescription)")
-			}
-			
-			print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			}			
 		}
 	}
 }

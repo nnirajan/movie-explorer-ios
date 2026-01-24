@@ -30,7 +30,7 @@ protocol NetworkRequest {
 
 /// Deafult implementations
 extension NetworkRequest {
-	var headers: [String: String] { [:] }
+	var headers: HTTPHeaders? { nil }
 	var overridenBaseURL: String? { nil }
 	var timeoutInterval: TimeInterval { 60 }
 }

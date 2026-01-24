@@ -34,6 +34,13 @@ final class NetworkClient: NetworkClientProtocol {
 		do {
 			return try configuration.decoder.decode(T.self, from: data)
 		} catch {
+			print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			print("❌ Decoding Error for type: \(T.self)")
+			print("⚠️  Error: \(error.localizedDescription)")
+			if let decodingError = error as? DecodingError {
+				print("💬 Detailed Error: \(decodingError)")
+			}			
+			
 			throw NetworkError.decodingError(error)
 		}
 	}
@@ -73,7 +80,6 @@ final class NetworkClient: NetworkClientProtocol {
 			try await applyInterceptors(request: request, response: validResponse, data: data, error: nil)
 
 			return data
-
 		} catch {
 			// Call interceptors on error
 			try await applyInterceptors(request: request, response: httpResponse, data: responseData, error: error)

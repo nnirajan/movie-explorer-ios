@@ -7,20 +7,39 @@
 
 import Foundation
 
+/// Base protocol for all dependency containers
 protocol DependencyContainer {
 	var networkClient: NetworkClientProtocol { get }
 }
 
-final class AppDependencyContainer: DependencyContainer {
-	// MARK: - Singleton
-	static let shared = AppDependencyContainer()
-
-	// MARK: - Environment
-	private let environment: EnvironmentType
-
-	// MARK: - Network Client
-	private(set) lazy var networkClient: NetworkClientProtocol = {
-		let config = NetworkConfiguration(
+// MARK: - NetworkConfigurationFactory
+final class NetworkConfigurationFactory {
+	static func makeConfiguration(
+		baseURL: URL,
+		apiKey: String,
+		environment: EnvironmentType
+	) -> NetworkConfiguration {
+		let adapters: [RequestAdapter] = []
+		
+		let retrier = RetryPolicy(
+			maxRetryCount: 3,
+			retryableStatusCodes: [408, 429, 500, 502, 503, 504],
+			retryDelay: 1.0
+		)
+		
+		let validator = DefaultResponseValidator()
+		
+		let defaultHeaders: HTTPHeaders = [
+			"Accept": "application/json",
+			"Authorization": "Bearer \(apiKey)",
+			"Content-Type": "application/json"
+		]
+		
+		let interceptors: [RequestInterceptor] = environment.isDebug
+			? [LoggingInterceptor(logLevel: .verbose)]
+			: [LoggingInterceptor(logLevel: .error)]
+		
+		return NetworkConfiguration(
 			baseURL: baseURL,
 			adapters: adapters,
 			interceptors: interceptors,
@@ -28,61 +47,39 @@ final class AppDependencyContainer: DependencyContainer {
 			validator: validator,
 			defaultHeaders: defaultHeaders
 		)
-		return NetworkClient(configuration: config)
+	}
+}
+
+// MARK: - AppDependencyContainer
+final class AppDependencyContainer: DependencyContainer {
+	// MARK: - Singleton
+	static let shared = AppDependencyContainer()
+	
+	// MARK: - Public Dependencies
+	private(set) lazy var networkClient: NetworkClientProtocol = {
+		NetworkClient(configuration: networkConfiguration)
 	}()
-
-	// MARK: - Private Properties
-	private let baseURL: URL
-	private let adapters: [RequestAdapter]
-	private let interceptors: [RequestInterceptor]
-	private let retrier: RequestRetrier?
-	private let validator: ResponseValidator?
-	private let defaultHeaders: HTTPHeaders
-
+	
+	// MARK: - Properties
+	private let environment: EnvironmentType
+	private let networkConfiguration: NetworkConfiguration
+	
 	// MARK: - Initialization
 	private init() {
-		// Get environment
 		self.environment = BuildConfiguration.getAppEnvironment()
-
-		// Get base URL from xcconfig
+		
+		// Setup network configuration
 		do {
-			self.baseURL = try BuildConfiguration.getBaseURL()
+			let baseURL = try BuildConfiguration.getBaseURL()
+			let apiKey = try BuildConfiguration.getAPIKey()
+			
+			self.networkConfiguration = NetworkConfigurationFactory.makeConfiguration(
+				baseURL: baseURL,
+				apiKey: apiKey,
+				environment: environment
+			)
 		} catch {
-			fatalError("Failed to load BASE_URL from configuration: \(error.localizedDescription)")
+			fatalError("Failed to configure network: \(error.localizedDescription)")
 		}
-
-		// Setup adapters (no auth adapter needed - using default headers)
-		self.adapters = []
-
-		// Setup interceptors based on environment
-		var interceptorList: [RequestInterceptor] = []
-
-		if environment.isDebug {
-			interceptorList.append(LoggingInterceptor(logLevel: .verbose))
-		} else {
-			interceptorList.append(LoggingInterceptor(logLevel: .error))
-		}
-
-		self.interceptors = interceptorList
-
-		// Setup retry policy
-		self.retrier = RetryPolicy(
-			maxRetryCount: 3,
-			retryableStatusCodes: [408, 429, 500, 502, 503, 504],
-			retryDelay: 1.0
-		)
-
-		// Setup validator
-		self.validator = DefaultResponseValidator()
-
-		// Get API token from xcconfig
-		let apiKey: String = (try? BuildConfiguration.getAPIKey()) ?? ""
-
-		// Setup default headers with Bearer token
-		self.defaultHeaders = [
-			"Accept": "application/json",
-			"Authorization": "Bearer \(apiKey)",
-			"Content-Type": "application/json"
-		]
 	}
 }
