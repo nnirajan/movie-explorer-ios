@@ -13,7 +13,7 @@ struct MovieListItemView: View {
 	
     var body: some View {
 		HStack(alignment: .top, spacing: 12) {
-			CachedImageView(path: movie.posterPath)
+			CachedImageView(path: movie.posterPath ?? "")
 				.cornerRadius(8)
 				.frame(width: 90, height: 140)
 			

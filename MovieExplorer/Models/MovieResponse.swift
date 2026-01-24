@@ -28,14 +28,15 @@ struct MovieResponse: Codable {
 	}
 }
 
-struct Movie: Codable {
+struct Movie: Codable, Identifiable {
 	var id: Int
 	var title, overview: String
 	var popularity: Double
-	var posterPath, releaseDate: String
+	var posterPath: String?
+	var releaseDate: String
 	var voteAverage: Double
 	var genreIDS: [Int]?
-	var backdropPath: String
+	var backdropPath: String?
 	var genres: [Genre]?
 	var runtime: Int?
 	
@@ -72,11 +73,11 @@ struct Movie: Codable {
 		self.title = try container.decode(String.self, forKey: .title)
 		self.overview = try container.decode(String.self, forKey: .overview)
 		self.popularity = try container.decode(Double.self, forKey: .popularity)
-		self.posterPath = try container.decode(String.self, forKey: .posterPath)
+		self.posterPath = try container.decodeIfPresent(String.self, forKey: .posterPath)
 		self.releaseDate = try container.decode(String.self, forKey: .releaseDate)
 		self.voteAverage = try container.decode(Double.self, forKey: .voteAverage)
 		self.genreIDS = try container.decodeIfPresent([Int].self, forKey: .genreIDS)
-		self.backdropPath = try container.decode(String.self, forKey: .backdropPath)
+		self.backdropPath = try container.decodeIfPresent(String.self, forKey: .backdropPath)
 		self.genres = try container.decodeIfPresent([Genre].self, forKey: .genres)
 		self.runtime = try container.decodeIfPresent(Int.self, forKey: .runtime)
 	}

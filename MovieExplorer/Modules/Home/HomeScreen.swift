@@ -39,7 +39,7 @@ struct HomeScreen: View {
 								LazyHStack(spacing: 10) {
 									ForEach(viewModel.nowPlayingMovies, id: \.id) { movie in
 										VStack(alignment: .leading, spacing: 4) {
-											CachedImageView(path: movie.posterPath)
+											CachedImageView(path: movie.posterPath ?? "")
 												.cornerRadius(8)
 												.frame(height: 212)
 											
@@ -57,7 +57,6 @@ struct HomeScreen: View {
 										.onTapGesture {
 											router.push(.movieDetail(id: movie.id))
 										}
-										
 									}
 								}
 							}
@@ -73,6 +72,10 @@ struct HomeScreen: View {
 							LazyVStack(spacing: 10) {
 								ForEach(popularMovies, id: \.id) { movie in
 									MovieListItemView(movie: movie, genres: viewModel.genres)
+										.contentShape(Rectangle())
+										.onTapGesture {
+											router.push(.movieDetail(id: movie.id))
+										}
 										.onAppear {
 											if movie.id == popularMovies.last?.id {
 												Task {

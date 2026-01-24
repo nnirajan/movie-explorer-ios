@@ -30,6 +30,7 @@ enum DashBoardRoute: Route {
 	case home
 	case favourites
 	case movieDetail(id: Int)
+	case search
 
 	var id: String {
 		switch self {
@@ -39,7 +40,8 @@ enum DashBoardRoute: Route {
 			return "favourites"
 		case .movieDetail(let id):
 			return "detail_\(id)"
-			
+		case .search:
+			return "search"
 		}
 	}
 }
@@ -49,10 +51,14 @@ struct DashboardScreen: View {
 	
 	@State private var dashboardRouter = Router<DashBoardRoute>()
 	
+	var navigationTitle: String {
+		tabSelection == .home ? "" : "Favourites"
+	}
+	
 	var body: some View {
 		NavigationStackRouter(
 			router: dashboardRouter,
-			root: { router in
+			root: { _ in
 				TabView(selection: $tabSelection) {
 					Tab(
 						DashboardTab.home.title,
@@ -76,19 +82,30 @@ struct DashboardScreen: View {
 					Tab(
 						DashboardTab.favorites.title,
 						systemImage: DashboardTab.favorites.icon,
-						value: .home,
+						value: .favorites,
 						content: {
 							FavouritesScreen()
 						}
 					)
+				}
+				.toolbar {
+					if tabSelection == .home {
+						ToolbarItem(placement: .topBarTrailing) {
+							Button {
+								dashboardRouter.push(.search)
+							} label: {
+								Image(systemName: "magnifyingglass")
+							}
+						}
+					}
 				}
 			},
 			destination: { (route, router) in
 				handleDashboardRoutes(for: route, router: router)
 			}
 		)
+		.navigationTitle(navigationTitle)
 		.navigationBarTitleDisplayMode(.inline)
-		
 	}
 	
 	@ViewBuilder
@@ -107,20 +124,14 @@ struct DashboardScreen: View {
 					)
 				)
 			)
-		}
-	}
-	
-	
-	// MARK: - Home Destinations
-	@ViewBuilder
-	private func homeDestination(for route: HomeRoute, router: Router<HomeRoute>) -> some View {
-		switch route {
-		case .home:
-			HomeTabView(router: router)
-		case .detail(let id):
-			DetailView(id: id, router: router)
-		case .nestedDetail(let id, let subId):
-			NestedDetailView(id: id, subId: subId, router: router)
+		case .search:
+			SearchScreen(
+				viewModel: SearchViewModel(
+					searchRepository: SearchRepositoryImpl(
+						networkClient: AppDependencyContainer.shared.networkClient
+					)
+				), router: router
+			)
 		}
 	}
 }

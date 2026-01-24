@@ -25,12 +25,12 @@ struct DetailScreen: View {
 					if let movie = viewModel.movie {
 						LazyVStack(alignment: .leading, spacing: 12) {
 							ZStack(alignment: .top) {
-								CachedImageView(path: movie.backdropPath, size: .original)
+								CachedImageView(path: movie.backdropPath ?? "", size: .original)
 									.frame(height: 280)
 									.cornerRadius(12, corners: [.bottomLeft, .bottomRight])
 								
 								HStack(alignment: .top, spacing: 8) {
-									CachedImageView(path: movie.posterPath, size: .original)
+									CachedImageView(path: movie.posterPath ?? "", size: .original)
 										.frame(width: 144, height: 212)
 										.cornerRadius(8)
 										.shadow(radius: 5)
@@ -115,7 +115,19 @@ struct DetailScreen: View {
 				viewModel.getInitialData()
 			}
 		)
-		
+		.toolbar {
+			ToolbarItem(placement: .topBarTrailing) {
+				Button(
+					action: {
+						
+						
+					},
+					label: {
+						Image(systemName: "heart")
+					}
+				)
+			}
+		}
 	}
 }
 

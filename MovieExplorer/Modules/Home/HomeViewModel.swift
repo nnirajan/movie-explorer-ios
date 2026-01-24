@@ -92,7 +92,9 @@ class HomeViewModel: BaseViewModel {
 		guard !isFetchingMore, hasMorePopularMovies else { return }
 		
 		isFetchingMore = true
-		defer { isFetchingMore = false }
+		defer {
+			isFetchingMore = false
+		}
 		
 		let nextPage = (popularResponse?.page ?? 1) + 1
 		
