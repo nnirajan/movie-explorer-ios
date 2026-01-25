@@ -7,36 +7,42 @@
 
 import SwiftUI
 
-struct BaseView<Content: View, VM: BaseViewModel>: View {
+struct BaseView<Content: View, EmptyContent: View, VM: BaseViewModel>: View {
 	@State var viewModel: VM
 	
 	let isRefreshable: Bool
 	let content: () -> Content
+	let emptyView: () -> EmptyContent
 	let loadData: (() async -> Void)?
 	
 	init(
 		viewModel: VM,
 		isRefreshable: Bool = false,
 		@ViewBuilder content: @escaping () -> Content,
+		@ViewBuilder emptyView: @escaping () -> EmptyContent = { EmptyView() },
 		loadData: (() async -> Void)? = nil
 	) {
 		self.viewModel = viewModel
 		self.isRefreshable = isRefreshable
 		self.content = content
+		self.emptyView = emptyView
 		self.loadData = loadData
 	}
 	
 	var body: some View {
-		ZStack {
+		VStack {
 			switch viewModel.state {
 			case .idle:
 				EmptyView()
 				
+			case .loading:
+				loaderView
+				
 			case .content:
 				mainContent
 				
-			case .loading:
-				loaderView
+			case .empty:
+				emptyView()
 				
 			case .error(let error):
 				ContentUnavailableStateView(

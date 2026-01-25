@@ -6,48 +6,11 @@
 //
 
 import Foundation
+import SwiftData
 
 /// Base protocol for all dependency containers
 protocol DependencyContainer {
 	var networkClient: NetworkClientProtocol { get }
-}
-
-// MARK: - NetworkConfigurationFactory
-final class NetworkConfigurationFactory {
-	static func makeConfiguration(
-		baseURL: URL,
-		apiKey: String,
-		environment: EnvironmentType
-	) -> NetworkConfiguration {
-		let adapters: [RequestAdapter] = []
-		
-		let retrier = RetryPolicy(
-			maxRetryCount: 3,
-			retryableStatusCodes: [408, 429, 500, 502, 503, 504],
-			retryDelay: 1.0
-		)
-		
-		let validator = DefaultResponseValidator()
-		
-		let defaultHeaders: HTTPHeaders = [
-			"Accept": "application/json",
-			"Authorization": "Bearer \(apiKey)",
-			"Content-Type": "application/json"
-		]
-		
-		let interceptors: [RequestInterceptor] = environment.isDebug
-			? [LoggingInterceptor(logLevel: .verbose)]
-			: [LoggingInterceptor(logLevel: .error)]
-		
-		return NetworkConfiguration(
-			baseURL: baseURL,
-			adapters: adapters,
-			interceptors: interceptors,
-			retrier: retrier,
-			validator: validator,
-			defaultHeaders: defaultHeaders
-		)
-	}
 }
 
 // MARK: - AppDependencyContainer
@@ -81,5 +44,111 @@ final class AppDependencyContainer: DependencyContainer {
 		} catch {
 			fatalError("Failed to configure network: \(error.localizedDescription)")
 		}
+	}
+}
+
+// MARK: - Storage
+extension AppDependencyContainer {
+	/// Shared ModelContainer for all SwiftData operations
+	var modelContainer: ModelContainer {
+		let schema = Schema(
+			[
+				GenreEntity.self,
+				MovieEntity.self,
+				FavouriteMovieEntity.self
+			]
+		)
+		
+		let modelConfiguration = ModelConfiguration(
+			schema: schema,
+			isStoredInMemoryOnly: false,
+			allowsSave: true,
+			cloudKitDatabase: .none  // ⬅️ Add this
+		)
+		
+		do {
+			let container = try ModelContainer(
+				for: schema,
+				configurations: [modelConfiguration]
+			)
+			return container
+		} catch {
+			print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			print("❌ ModelContainer creation failed: \(error)")
+			print("❌ Error details: \(error.localizedDescription)")
+			fatalError("Failed to create ModelContainer: \(error)")
+		}
+	}
+}
+
+// MARK: - Repository Factories
+extension AppDependencyContainer {
+	// MARK: - Genre Repository
+	func makeGenreRepository() -> GenreRepository {
+		GenreRepositoryImpl(
+			networkClient: networkClient,
+			localRepository: GenreLocalRepository(
+				dataSource: GenreLocalDataSource(
+					modelContainer: modelContainer
+				)
+			)
+		)
+	}
+	
+	// MARK: - Movie Repository
+	func makeMovieRepository() -> MovieRepository {
+		MovieRepositoryImpl(
+			networkClient: networkClient,
+			localRepository: MovieLocalRepository(
+				dataSource: MovieLocalDataSource(
+					modelContainer: modelContainer
+				)
+			)
+		)
+	}
+	
+	// MARK: - Search Repository
+	func makeSearchRepository() -> SearchRepository {
+		SearchRepositoryImpl(
+			networkClient: networkClient
+		)
+	}
+	
+	func makeFavouriteRepository() -> FavouriteRepository {
+		FavouriteRepositoryImpl(
+			localDataSource: FavouriteLocalDataSource(
+				modelContainer: modelContainer
+			)
+		)
+	}
+}
+
+// MARK: - ViewModel Factories
+extension AppDependencyContainer {
+	func makeHomeViewModel() -> HomeViewModel {
+		HomeViewModel(
+			movieRepository: makeMovieRepository(),
+			genreRepository: makeGenreRepository()
+		)
+	}
+	
+	func makeDetailViewModel(movieID: Int) -> DetailViewModel {
+		DetailViewModel(
+			movieID: movieID,
+			movieRepository: makeMovieRepository(),
+			favouriteRepository: makeFavouriteRepository()
+		)
+	}
+	
+	func makeSearchViewModel() -> SearchViewModel {
+		SearchViewModel(
+			searchRepository: makeSearchRepository()
+		)
+	}
+	
+	func makeFavouriteViewModel() -> FavouriteViewModel {
+		FavouriteViewModel(
+			favouriteRepository: makeFavouriteRepository()
+		)
 	}
 }

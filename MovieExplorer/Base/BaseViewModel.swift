@@ -5,12 +5,13 @@
 //  Created by Nirajan Shrestha on 23/01/2026.
 //
 
-import Observation
+import Foundation
 
 enum ViewState: Equatable {
 	case idle
 	case loading
 	case content
+	case empty
 	case error(ViewError)
 }
 
@@ -28,6 +29,7 @@ class BaseViewModel {
 	}
 
 	deinit {
+		NotificationCenter.default.removeObserver(self)
 		debugPrint("De-Initialized --> \(type(of: self))")
 	}
 
@@ -38,6 +40,10 @@ class BaseViewModel {
 
 	func setContent() {
 		state = .content
+	}
+	
+	func setEmpty() {
+		state = .empty
 	}
 
 	func setError(

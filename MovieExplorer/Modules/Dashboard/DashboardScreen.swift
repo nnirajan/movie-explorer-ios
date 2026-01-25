@@ -66,14 +66,7 @@ struct DashboardScreen: View {
 						value: .home,
 						content: {
 							HomeScreen(
-								viewModel: HomeViewModel(
-									movieRepository: MovieRepositoryImpl(
-										networkClient: AppDependencyContainer.shared.networkClient
-									),
-									genreRepository: GenreRepositoryImpl(
-										networkClient: AppDependencyContainer.shared.networkClient
-									)
-								),
+								viewModel: AppDependencyContainer.shared.makeHomeViewModel(),
 								router: dashboardRouter
 							)
 						}
@@ -84,7 +77,10 @@ struct DashboardScreen: View {
 						systemImage: DashboardTab.favorites.icon,
 						value: .favorites,
 						content: {
-							FavouritesScreen()
+							FavouritesScreen(
+								viewModel: AppDependencyContainer.shared.makeFavouriteViewModel(),
+								router: dashboardRouter
+							)
 						}
 					)
 				}
@@ -99,13 +95,13 @@ struct DashboardScreen: View {
 						}
 					}
 				}
+				.navigationTitle(navigationTitle)
+				.navigationBarTitleDisplayMode(.inline)
 			},
 			destination: { (route, router) in
 				handleDashboardRoutes(for: route, router: router)
 			}
 		)
-		.navigationTitle(navigationTitle)
-		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -113,24 +109,23 @@ struct DashboardScreen: View {
 		switch route {
 		case .home:
 			EmptyView()
+			
 		case .favourites:
 			EmptyView()
+			
 		case .movieDetail(let id):
 			DetailScreen(
-				viewModel: DetailViewModel(
-					movieID: id,
-					movieRepository: MovieRepositoryImpl(
-						networkClient: AppDependencyContainer.shared.networkClient
-					)
-				)
+				viewModel: AppDependencyContainer.shared.makeDetailViewModel(movieID: id)
 			)
+			
 		case .search:
 			SearchScreen(
 				viewModel: SearchViewModel(
 					searchRepository: SearchRepositoryImpl(
 						networkClient: AppDependencyContainer.shared.networkClient
 					)
-				), router: router
+				),
+				router: router
 			)
 		}
 	}

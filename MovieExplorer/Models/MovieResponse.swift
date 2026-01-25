@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - MovieResponse
 struct MovieResponse: Codable {
 	var results: [Movie]
 	var page: Int
@@ -28,6 +29,17 @@ struct MovieResponse: Codable {
 	}
 }
 
+extension MovieResponse {
+	init(results: [Movie], page: Int, totalPages: Int, totalResults: Int) {
+		self.results = results
+		self.page = page
+		self.totalPages = totalPages
+		self.totalResults = totalResults
+	}
+}
+
+
+// MARK: - Movie
 struct Movie: Codable, Identifiable {
 	var id: Int
 	var title, overview: String
@@ -80,5 +92,32 @@ struct Movie: Codable, Identifiable {
 		self.backdropPath = try container.decodeIfPresent(String.self, forKey: .backdropPath)
 		self.genres = try container.decodeIfPresent([Genre].self, forKey: .genres)
 		self.runtime = try container.decodeIfPresent(Int.self, forKey: .runtime)
+	}
+}
+
+extension Movie {
+	init(
+		id: Int,
+		title: String,
+		overview: String,
+		popularity: Double,
+		posterPath: String?,
+		releaseDate: String,
+		voteAverage: Double,
+		genreIDS: [Int]?,
+		backdropPath: String?,
+		runtime: Int?
+	) {
+		self.id = id
+		self.title = title
+		self.overview = overview
+		self.popularity = popularity
+		self.posterPath = posterPath
+		self.releaseDate = releaseDate
+		self.voteAverage = voteAverage
+		self.genreIDS = genreIDS
+		self.backdropPath = backdropPath
+		self.genres = nil // Not stored in cache
+		self.runtime = runtime
 	}
 }

@@ -12,17 +12,21 @@ class DetailViewModel: BaseViewModel {
 	// MARK: - properties
 	private let movieID: Int
 	private let movieRepository: MovieRepository
-
+	private let favouriteRepository: FavouriteRepository
+	
 	var movie: Movie?
 	var cast: [Cast] = []
+	var isFavourite: Bool = false
 	
 	// MARK: - init
 	init(
 		movieID: Int,
-		movieRepository: MovieRepository
+		movieRepository: MovieRepository,
+		favouriteRepository: FavouriteRepository
 	) {
 		self.movieID = movieID
 		self.movieRepository = movieRepository
+		self.favouriteRepository = favouriteRepository
 		super.init()
 	}
 	
@@ -37,11 +41,16 @@ class DetailViewModel: BaseViewModel {
 	// MARK: - getMovieDetail
 	@MainActor
 	func getMovieDetail() {
-		let request = MovieRequest.movieDetail(id: movieID)
-		
 		Task {
 			do {
-				self.movie = try await movieRepository.getMovieDetail(request: request)
+				let request = MovieRequest.movieDetail(id: movieID)
+				
+				async let detailTask = movieRepository.getMovieDetail(request: request)
+				async let favouriteTask = favouriteRepository.isFavourite(movieId: movieID)
+				
+				let (movie, isFavourite) = try await (detailTask, favouriteTask)
+				self.movie = movie
+				self.isFavourite = isFavourite
 				setContent()
 			} catch {
 				setError()
@@ -60,6 +69,31 @@ class DetailViewModel: BaseViewModel {
 				cast = castResponse.cast
 			} catch {
 				
+			}
+		}
+	}
+	
+	@MainActor
+	func toggleFavourite() {
+		guard let movie else { return }
+		
+		Task {
+			do {
+				if isFavourite {
+					print("🔄 Toggling OFF favourite for: \(movie.title)")
+					try await favouriteRepository.removeFromFavourite(movieId: movie.id)
+					isFavourite = false
+				} else {
+					print("🔄 Toggling ON favourite for: \(movie.title)")
+					try await favouriteRepository.addToFavourite(movie)
+					isFavourite = true
+				}
+				
+				// Post notification AFTER successful operation
+				NotificationCenter.default.post(name: .favourite, object: nil)
+				
+			} catch {
+				print("❌ Failed to toggle favourite: \(error)")
 			}
 		}
 	}

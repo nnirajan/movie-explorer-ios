@@ -8,11 +8,51 @@
 import SwiftUI
 
 struct FavouritesScreen: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
+	@State private var viewModel: FavouriteViewModel
+	let router: Router<DashBoardRoute>
+	
+	init(
+		viewModel: FavouriteViewModel,
+		router: Router<DashBoardRoute>
+	) {
+		self.viewModel = viewModel
+		self.router = router
+	}
+	
+	var body: some View {
+		BaseView(
+			viewModel: viewModel,
+			isRefreshable: true,
+			content: {
+				ScrollView(.vertical) {
+					ForEach(viewModel.movies, id: \.id) { movie in
+						MovieListItemView(movie: movie, genres: [])
+							.contentShape(Rectangle())
+							.onTapGesture {
+								router.push(.movieDetail(id: movie.id))
+							}
+					}
+				}
+				.scrollIndicators(.hidden)
+				.safeAreaPadding(.horizontal)
+				.safeAreaPadding(.bottom)
+			},
+			emptyView: {
+				PlaceholderView(
+					icon: "film.stack",
+					title: "No Movies Found",
+					message: "No Favourite Movies yet. Start browsing and adding them here."
+				)
+			},
+			loadData: {
+				viewModel.getInitialData()
+			}
+		)
+	}
 }
 
-#Preview {
-    FavouritesScreen()
-}
+//#Preview {
+//	FavouritesScreen(
+//		viewModel: AppDependencyContainer.shared.makeFavouriteViewModel()
+//	)
+//}

@@ -64,7 +64,7 @@ struct DetailScreen: View {
 								FlowLayout(horizontalSpacing: 6, verticalSpacing: 6, alignment: .center) {
 									ForEach(genres, id: \.id) { genre in
 										ChipView(
-											text: genre.name ?? "",
+											text: genre.name,
 										)
 									}
 								}
@@ -119,11 +119,11 @@ struct DetailScreen: View {
 			ToolbarItem(placement: .topBarTrailing) {
 				Button(
 					action: {
-						
-						
+						viewModel.toggleFavourite()
 					},
 					label: {
-						Image(systemName: "heart")
+						Image(systemName: viewModel.isFavourite ? "heart.fill" : "heart")
+							.foregroundStyle(.red)
 					}
 				)
 			}
@@ -134,11 +134,8 @@ struct DetailScreen: View {
 // MARK: - Preview
 #Preview {
 	DetailScreen(
-		viewModel: DetailViewModel(
-			movieID: 991494,
-			movieRepository: MovieRepositoryImpl(
-				networkClient: AppDependencyContainer.shared.networkClient
-			)
+		viewModel: AppDependencyContainer.shared.makeDetailViewModel(
+			movieID: 991494
 		)
 	)
 }
