@@ -16,13 +16,25 @@ public protocol Route: Hashable, Identifiable {
 
 // MARK: - Router
 /// Main navigation router class that manages the navigation stack
-@MainActor
-public final class Router<R: Route>: ObservableObject {
 
-	// MARK: - Published Properties
-	@Published public var path: [R] = []
-	@Published public var sheet: R?
-	@Published public var fullScreenCover: R?
+// OLD: ObservableObject required @Published on every property and @ObservedObject/@StateObject in views
+// @MainActor
+// public final class Router<R: Route>: ObservableObject {
+//
+//     // MARK: - Published Properties
+//     @Published public var path: [R] = []
+//     @Published public var sheet: R?
+//     @Published public var fullScreenCover: R?
+
+// NEW: @Observable auto-tracks all stored properties — no @Published needed
+@Observable
+@MainActor
+public final class Router<R: Route> {
+
+	// MARK: - Properties
+	public var path: [R] = []
+	public var sheet: R?
+	public var fullScreenCover: R?
 
 	// MARK: - Initializer
 	public init() {}
@@ -153,7 +165,12 @@ public final class Router<R: Route>: ObservableObject {
 // MARK: - NavigationStackRouter View
 /// A view that wraps NavigationStack with Router capabilities
 public struct NavigationStackRouter<R: Route, Root: View, Destination: View>: View {
-	@ObservedObject private var router: Router<R>
+
+	// OLD: @ObservedObject was needed because Router was ObservableObject
+	// @ObservedObject private var router: Router<R>
+
+	// NEW: plain let — @Observable auto-tracks accessed properties during body rendering
+	private let router: Router<R>
 	private let root: (Router<R>) -> Root
 	private let buildDestination: (R, Router<R>) -> Destination
 
@@ -168,6 +185,10 @@ public struct NavigationStackRouter<R: Route, Root: View, Destination: View>: Vi
 	}
 
 	public var body: some View {
+		// @Bindable creates two-way bindings ($router.path, $router.sheet, etc.)
+		// from an @Observable object — must be declared inside body
+		@Bindable var router = router
+
 		NavigationStack(path: $router.path) {
 			root(router)
 				.navigationDestination(for: R.self) { route in
