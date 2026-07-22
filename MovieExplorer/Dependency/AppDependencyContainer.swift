@@ -17,25 +17,59 @@ protocol DependencyContainer {
 final class AppDependencyContainer: DependencyContainer {
 	// MARK: - Singleton
 	static let shared = AppDependencyContainer()
-	
-	// MARK: - Public Dependencies
+
+	// MARK: - Dependencies
 	private(set) lazy var networkClient: NetworkClientProtocol = {
 		NetworkClient(configuration: networkConfiguration)
 	}()
-	
+
+	private(set) lazy var modelContainer: ModelContainer = {
+		let schema = Schema(AppMigrationPlan.currentModels)
+
+		let config = ModelConfiguration(
+			schema: schema,
+			isStoredInMemoryOnly: false,
+			allowsSave: true,
+			cloudKitDatabase: .none
+		)
+
+		do {
+			return try ModelContainer(
+				for: schema,
+				migrationPlan: AppMigrationPlan.self,
+				configurations: [config]
+			)
+		} catch let migrationError {
+			#if DEBUG
+			fatalError("[AppDependencyContainer] migration failed: \(migrationError)")
+			#else
+			print("[AppDependencyContainer] migration failed: \(migrationError)")
+
+			do { try FileManager.default.removeItem(at: config.url) } catch {
+				print("[AppDependencyContainer] store wipe failed: \(error)")
+			}
+
+			do {
+				return try ModelContainer(for: schema, configurations: [config])
+			} catch {
+				fatalError("[AppDependencyContainer] failed to open store even after wipe: \(error)")
+			}
+			#endif
+		}
+	}()
+
 	// MARK: - Properties
 	private let environment: EnvironmentType
 	private let networkConfiguration: NetworkConfiguration
-	
+
 	// MARK: - Initialization
 	private init() {
 		self.environment = BuildConfiguration.getAppEnvironment()
-		
-		// Setup network configuration
+
 		do {
 			let baseURL = try BuildConfiguration.getBaseURL()
 			let apiKey = try BuildConfiguration.getAPIKey()
-			
+
 			self.networkConfiguration = NetworkConfigurationFactory.makeConfiguration(
 				baseURL: baseURL,
 				apiKey: apiKey,
@@ -47,43 +81,8 @@ final class AppDependencyContainer: DependencyContainer {
 	}
 }
 
-// MARK: - Storage
-extension AppDependencyContainer {
-	/// Shared ModelContainer for all SwiftData operations
-	var modelContainer: ModelContainer {
-		let schema = Schema(
-			[
-				GenreEntity.self,
-				MovieEntity.self,
-				FavouriteMovieEntity.self
-			]
-		)
-		
-		let modelConfiguration = ModelConfiguration(
-			schema: schema,
-			isStoredInMemoryOnly: false,
-			allowsSave: true,
-			cloudKitDatabase: .none  // ⬅️ Add this
-		)
-		
-		do {
-			let container = try ModelContainer(
-				for: schema,
-				configurations: [modelConfiguration]
-			)
-			return container
-		} catch {
-			print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-			print("❌ ModelContainer creation failed: \(error)")
-			print("❌ Error details: \(error.localizedDescription)")
-			fatalError("Failed to create ModelContainer: \(error)")
-		}
-	}
-}
-
 // MARK: - Repository Factories
 extension AppDependencyContainer {
-	// MARK: - Genre Repository
 	func makeGenreRepository() -> GenreRepository {
 		GenreRepositoryImpl(
 			networkClient: networkClient,
@@ -94,8 +93,7 @@ extension AppDependencyContainer {
 			)
 		)
 	}
-	
-	// MARK: - Movie Repository
+
 	func makeMovieRepository() -> MovieRepository {
 		MovieRepositoryImpl(
 			networkClient: networkClient,
@@ -106,14 +104,11 @@ extension AppDependencyContainer {
 			)
 		)
 	}
-	
-	// MARK: - Search Repository
+
 	func makeSearchRepository() -> SearchRepository {
-		SearchRepositoryImpl(
-			networkClient: networkClient
-		)
+		SearchRepositoryImpl(networkClient: networkClient)
 	}
-	
+
 	func makeFavouriteRepository() -> FavouriteRepository {
 		FavouriteRepositoryImpl(
 			localDataSource: FavouriteLocalDataSource(
@@ -131,7 +126,7 @@ extension AppDependencyContainer {
 			genreRepository: makeGenreRepository()
 		)
 	}
-	
+
 	func makeDetailViewModel(movieID: Int) -> DetailViewModel {
 		DetailViewModel(
 			movieID: movieID,
@@ -139,16 +134,12 @@ extension AppDependencyContainer {
 			favouriteRepository: makeFavouriteRepository()
 		)
 	}
-	
+
 	func makeSearchViewModel() -> SearchViewModel {
-		SearchViewModel(
-			searchRepository: makeSearchRepository()
-		)
+		SearchViewModel(searchRepository: makeSearchRepository())
 	}
-	
+
 	func makeFavouriteViewModel() -> FavouriteViewModel {
-		FavouriteViewModel(
-			favouriteRepository: makeFavouriteRepository()
-		)
+		FavouriteViewModel(favouriteRepository: makeFavouriteRepository())
 	}
 }

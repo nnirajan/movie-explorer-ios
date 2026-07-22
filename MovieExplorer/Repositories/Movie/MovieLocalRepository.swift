@@ -70,7 +70,7 @@ final class MovieLocalRepository {
 		
 		// Check which movies already exist and update/insert accordingly
 		for entity in entities {
-			if await dataSource.movieExists(entity.id, category: category) {
+			if await dataSource.movieExists(entity.movieId, category: category) {
 				try await dataSource.updateMovie(entity)
 			} else {
 				try await dataSource.saveMovie(entity)
@@ -99,7 +99,7 @@ final class MovieLocalRepository {
 		let entity = try mapper.toEntity(movie, category: category)
 		
 		// Check if movie already exists in this category
-		if await dataSource.movieExists(entity.id, category: category) {
+		if await dataSource.movieExists(entity.movieId, category: category) {
 			try await dataSource.updateMovie(entity)
 		} else {
 			try await dataSource.saveMovie(entity)

@@ -1,5 +1,5 @@
 //
-//  GenreEntityMapper.swift
+//  MovieEntityMapper.swift
 //  MovieExplorer
 //
 //  Created by Nirajan Shrestha on 25/01/2026.
@@ -10,13 +10,17 @@ import Foundation
 struct MovieEntityMapper: EntityMapper {
 	typealias DomainModel = Movie
 	typealias EntityModel = MovieEntity
-	
+
 	// MARK: - EntityMapper Implementation
-	
-	/// Converts Movie to MovieEntity with category
+
+	func toEntity(_ domain: Movie) throws -> MovieEntity {
+		// Category is always required — use toEntity(_:category:) instead.
+		throw StorageError.mappingFailed(reason: "MovieEntityMapper requires a category. Use toEntity(_:category:).")
+	}
+
 	func toEntity(_ domain: Movie, category: MovieCategory) throws -> MovieEntity {
-		return MovieEntity(
-			id: domain.id,
+		MovieEntity(
+			movieId: domain.id,
 			title: domain.title,
 			overview: domain.overview,
 			popularity: domain.popularity,
@@ -29,20 +33,14 @@ struct MovieEntityMapper: EntityMapper {
 			category: category
 		)
 	}
-	
-	/// Converts array of Movies to MovieEntities with category
+
 	func toEntities(_ domains: [Movie], category: MovieCategory) throws -> [MovieEntity] {
 		try domains.map { try toEntity($0, category: category) }
 	}
-	
-	func toEntity(_ domain: Movie) throws -> MovieEntity {
-		// Default to detail category if not specified
-		return try toEntity(domain, category: .nowPlaying)
-	}
-	
+
 	func toDomain(_ entity: MovieEntity) throws -> Movie {
-		return Movie(
-			id: entity.id,
+		Movie(
+			id: entity.movieId,
 			title: entity.title,
 			overview: entity.overview,
 			popularity: entity.popularity,

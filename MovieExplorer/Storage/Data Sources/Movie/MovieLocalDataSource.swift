@@ -44,30 +44,29 @@ final class MovieLocalDataSource {
 		return try await dataSource.fetch(where: predicate)
 	}
 	
-	/// Fetches a single movie by ID
+	/// Fetches a single movie by TMDB ID (any category)
 	func fetchMovieById(_ id: Int) async throws -> MovieEntity? {
 		let predicate = #Predicate<MovieEntity> { movie in
-			movie.id == id
+			movie.movieId == id
 		}
 		let results = try await dataSource.fetch(where: predicate)
 		return results.first
 	}
-	
-	/// Fetches a single movie by ID and category
+
+	/// Fetches a single movie by TMDB ID and category
 	func fetchMovie(byId id: Int, category: MovieCategory) async throws -> MovieEntity? {
 		let rawCategory = category.rawValue
-		
 		let predicate = #Predicate<MovieEntity> { movie in
-			movie.id == id && movie.category == rawCategory
+			movie.movieId == id && movie.category == rawCategory
 		}
 		let results = try await dataSource.fetch(where: predicate)
 		return results.first
 	}
-	
-	/// Fetches movies by IDs (useful for fetching specific categories)
+
+	/// Fetches movies by TMDB IDs
 	func fetchMoviesByIds(_ ids: [Int]) async throws -> [MovieEntity] {
 		let predicate = #Predicate<MovieEntity> { movie in
-			ids.contains(movie.id)
+			ids.contains(movie.movieId)
 		}
 		return try await dataSource.fetch(where: predicate)
 	}
@@ -102,10 +101,10 @@ final class MovieLocalDataSource {
 		try await dataSource.delete(where: predicate)
 	}
 	
-	/// Deletes movies by IDs
+	/// Deletes movies by TMDB IDs
 	func deleteMoviesByIds(_ ids: [Int]) async throws {
 		let predicate = #Predicate<MovieEntity> { movie in
-			ids.contains(movie.id)
+			ids.contains(movie.movieId)
 		}
 		try await dataSource.delete(where: predicate)
 	}
@@ -154,7 +153,8 @@ final class MovieLocalDataSource {
 	func fetchRecentMovies(limit: Int) async throws -> [MovieEntity] {
 		let sortDescriptor = SortDescriptor(\MovieEntity.createdAt, order: .reverse)
 		return try await dataSource.fetch(
-			sortBy: [sortDescriptor],
+			limit: limit,
+			offset: 0,
 			where: nil
 		)
 	}
