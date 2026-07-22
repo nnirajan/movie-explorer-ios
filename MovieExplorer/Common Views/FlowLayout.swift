@@ -97,7 +97,7 @@ struct FlowLayout: Layout {
 			
 			// Apply alignment to each line
 			for lineFrames in allLines {
-				let lineWidth = lineFrames.last!.maxX
+				let lineWidth = lineFrames.last?.maxX ?? 0
 				let offset = calculateOffset(
 					lineWidth: lineWidth,
 					maxWidth: maxWidth,

@@ -84,9 +84,9 @@ final class NetworkClient: NetworkClientProtocol {
 			// Call interceptors on error
 			try await applyInterceptors(request: request, response: httpResponse, data: responseData, error: error)
 
-			// Check if should retry
+			// Check if should retry — propagates CancellationError so cancelled tasks stop immediately
 			if let retrier = configuration.retrier,
-			   await retrier.shouldRetry(request: request, response: httpResponse, error: error, retryCount: retryCount) {
+			   try await retrier.shouldRetry(request: request, response: httpResponse, error: error, retryCount: retryCount) {
 				return try await executeWithRetry(request, retryCount: retryCount + 1)
 			}
 

@@ -49,4 +49,8 @@ final class FavouriteViewModel: BaseViewModel {
 			}
 		}
 	}
+
+	deinit {
+		NotificationCenter.default.removeObserver(self)
+	}
 }

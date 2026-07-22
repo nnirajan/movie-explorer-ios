@@ -13,26 +13,27 @@ final class NetworkConfigurationFactory {
 		apiKey: String,
 		environment: EnvironmentType
 	) -> NetworkConfiguration {
-		let adapters: [RequestAdapter] = []
-		
+		let adapters: [RequestAdapter] = [
+			AuthenticationAdapter(tokenProvider: { apiKey })
+		]
+
 		let retrier = RetryPolicy(
 			maxRetryCount: 3,
 			retryableStatusCodes: [408, 429, 500, 502, 503, 504],
 			retryDelay: 1.0
 		)
-		
+
 		let validator = DefaultResponseValidator()
-		
+
 		let defaultHeaders: HTTPHeaders = [
 			"Accept": "application/json",
-			"Authorization": "Bearer \(apiKey)",
 			"Content-Type": "application/json"
 		]
-		
+
 		let interceptors: [RequestInterceptor] = environment.isDebug
 			? [LoggingInterceptor(logLevel: .verbose)]
 			: [LoggingInterceptor(logLevel: .error)]
-		
+
 		return NetworkConfiguration(
 			baseURL: baseURL,
 			adapters: adapters,

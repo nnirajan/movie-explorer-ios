@@ -78,7 +78,7 @@ struct BaseView<Content: View, EmptyContent: View, VM: BaseViewModel>: View {
 	
 	@MainActor
 	private func runInitialLoadIfNeeded() async {
-		guard viewModel.state == .idle else { return }
+		guard viewModel.state == .idle, !viewModel.skipInitialLoad else { return }
 		await loadData?()
 	}
 	

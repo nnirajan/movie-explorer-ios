@@ -16,9 +16,13 @@ public enum SupportedDateFormat: String {
 
 extension Date {
 	func toString(format: SupportedDateFormat) -> String {
-		let formatter = DateFormatter()
-		formatter.dateFormat = format.rawValue
-		formatter.locale = .current
-		return formatter.string(from: self)
+		Date.sharedFormatter.dateFormat = format.rawValue
+		return Date.sharedFormatter.string(from: self)
 	}
+
+	private static let sharedFormatter: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.locale = .current
+		return formatter
+	}()
 }

@@ -40,7 +40,7 @@ final class FavouriteRepositoryImpl: FavouriteRepository {
 			return
 		}
 		
-		let entity = mapper.toEntity(from: movie)
+		let entity = try mapper.toEntity(movie)
 		try await localDataSource.saveFavourite(entity)
 		
 		print("✅ Successfully added to favourites: \(movie.title)")
@@ -65,7 +65,7 @@ final class FavouriteRepositoryImpl: FavouriteRepository {
 	func getFavourites() async throws -> [Movie] {
 		print("📚 Fetching all favourites...")
 		let entities = try await localDataSource.fetchAllFavourites()
-		let movies = entities.map { mapper.toDomain(from: $0) }
+		let movies = try mapper.toDomains(entities)
 		print("✅ Fetched \(movies.count) favourites")
 		return movies
 	}

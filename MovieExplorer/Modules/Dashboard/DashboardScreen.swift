@@ -120,11 +120,7 @@ struct DashboardScreen: View {
 			
 		case .search:
 			SearchScreen(
-				viewModel: SearchViewModel(
-					searchRepository: SearchRepositoryImpl(
-						networkClient: AppDependencyContainer.shared.networkClient
-					)
-				),
+				viewModel: AppDependencyContainer.shared.makeSearchViewModel(),
 				router: router
 			)
 		}

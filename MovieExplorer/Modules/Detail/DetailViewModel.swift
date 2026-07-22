@@ -9,16 +9,17 @@ import Foundation
 
 @Observable
 class DetailViewModel: BaseViewModel {
-	// MARK: - properties
+	// MARK: - Properties
 	private let movieID: Int
 	private let movieRepository: MovieRepository
 	private let favouriteRepository: FavouriteRepository
-	
+
 	var movie: Movie?
 	var cast: [Cast] = []
 	var isFavourite: Bool = false
-	
-	// MARK: - init
+	var creditsLoadFailed: Bool = false
+
+	// MARK: - Initialization
 	init(
 		movieID: Int,
 		movieRepository: MovieRepository,
@@ -29,71 +30,65 @@ class DetailViewModel: BaseViewModel {
 		self.favouriteRepository = favouriteRepository
 		super.init()
 	}
-	
+
 	// MARK: - getInitialData
+	// Both loads run concurrently via async let inside a single structured Task.
 	@MainActor
 	func getInitialData() {
 		setLoading()
-		getMovieDetail()
-		getCredits()
-	}
-	
-	// MARK: - getMovieDetail
-	@MainActor
-	func getMovieDetail() {
 		Task {
-			do {
-				let request = MovieRequest.movieDetail(id: movieID)
-				
-				async let detailTask = movieRepository.getMovieDetail(request: request)
-				async let favouriteTask = favouriteRepository.isFavourite(movieId: movieID)
-				
-				let (movie, isFavourite) = try await (detailTask, favouriteTask)
-				self.movie = movie
-				self.isFavourite = isFavourite
-				setContent()
-			} catch {
-				setError()
-			}
+			async let detail: Void = loadMovieDetail()
+			async let credits: Void = loadCredits()
+			_ = await (detail, credits)
 		}
 	}
-	
-	// MARK: - getCredits
+
+	// MARK: - Private Loaders
+
 	@MainActor
-	func getCredits() {
-		let request = MovieRequest.credits(id: movieID)
-		
-		Task {
-			do {
-				let castResponse = try await movieRepository.getCredits(request: request)
-				cast = castResponse.cast
-			} catch {
-				
-			}
+	private func loadMovieDetail() async {
+		do {
+			let request = MovieRequest.movieDetail(id: movieID)
+			async let detailTask = movieRepository.getMovieDetail(request: request)
+			async let favouriteTask = favouriteRepository.isFavourite(movieId: movieID)
+			let (movie, isFavourite) = try await (detailTask, favouriteTask)
+			self.movie = movie
+			self.isFavourite = isFavourite
+			setContent()
+		} catch {
+			setError()
 		}
 	}
-	
+
+	@MainActor
+	private func loadCredits() async {
+		do {
+			let request = MovieRequest.credits(id: movieID)
+			let castResponse = try await movieRepository.getCredits(request: request)
+			cast = castResponse.cast
+		} catch {
+			print("⚠️ [DetailViewModel] Failed to load credits: \(error)")
+			creditsLoadFailed = true
+		}
+	}
+
+	// MARK: - toggleFavourite
 	@MainActor
 	func toggleFavourite() {
 		guard let movie else { return }
-		
+
 		Task {
 			do {
 				if isFavourite {
-					print("🔄 Toggling OFF favourite for: \(movie.title)")
 					try await favouriteRepository.removeFromFavourite(movieId: movie.id)
 					isFavourite = false
 				} else {
-					print("🔄 Toggling ON favourite for: \(movie.title)")
 					try await favouriteRepository.addToFavourite(movie)
 					isFavourite = true
 				}
-				
-				// Post notification AFTER successful operation
 				NotificationCenter.default.post(name: .favourite, object: nil)
-				
 			} catch {
-				print("❌ Failed to toggle favourite: \(error)")
+				print("❌ [DetailViewModel] Failed to toggle favourite: \(error)")
 			}
 		}
 	}

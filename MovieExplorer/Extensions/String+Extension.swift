@@ -9,9 +9,13 @@ import Foundation
 
 extension String {
 	func toDate(format: SupportedDateFormat) -> Date? {
-		let formatter = DateFormatter()
-		formatter.dateFormat = format.rawValue
-		formatter.locale = .current
-		return formatter.date(from: self)
+		String.sharedFormatter.dateFormat = format.rawValue
+		return String.sharedFormatter.date(from: self)
 	}
+
+	private static let sharedFormatter: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.locale = .current
+		return formatter
+	}()
 }

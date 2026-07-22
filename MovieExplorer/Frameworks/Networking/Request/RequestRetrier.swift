@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Request Retry Protocol
 protocol RequestRetrier {
-	func shouldRetry(request: URLRequest, response: HTTPURLResponse?, error: Error?, retryCount: Int) async -> Bool
+	func shouldRetry(request: URLRequest, response: HTTPURLResponse?, error: Error?, retryCount: Int) async throws -> Bool
 }
 
 // MARK: - Retry Policy
@@ -28,24 +28,24 @@ final class RetryPolicy: RequestRetrier {
 		self.retryDelay = retryDelay
 	}
 	
-	func shouldRetry(request: URLRequest, response: HTTPURLResponse?, error: Error?, retryCount: Int) async -> Bool {
+	func shouldRetry(request: URLRequest, response: HTTPURLResponse?, error: Error?, retryCount: Int) async throws -> Bool {
 		guard retryCount < maxRetryCount else { return false }
-		
+
 		if let statusCode = response?.statusCode, retryableStatusCodes.contains(statusCode) {
-			try? await Task.sleep(nanoseconds: UInt64(retryDelay * 1_000_000_000))
+			try await Task.sleep(nanoseconds: UInt64(retryDelay * 1_000_000_000))
 			return true
 		}
-		
+
 		if let urlError = error as? URLError {
 			switch urlError.code {
 			case .timedOut, .networkConnectionLost, .notConnectedToInternet:
-				try? await Task.sleep(nanoseconds: UInt64(retryDelay * 1_000_000_000))
+				try await Task.sleep(nanoseconds: UInt64(retryDelay * 1_000_000_000))
 				return true
 			default:
 				return false
 			}
 		}
-		
+
 		return false
 	}
 }

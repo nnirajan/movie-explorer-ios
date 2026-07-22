@@ -24,6 +24,8 @@ class SearchViewModel: BaseViewModel, Searchable {
 	init(searchRepository: SearchRepository) {
 		self.searchRepository = searchRepository
 		super.init()
+		// Start in .content so BaseView renders the search interface immediately.
+		// The actual search results are controlled by searchState, not ViewState.
 		setContent()
 	}
 	

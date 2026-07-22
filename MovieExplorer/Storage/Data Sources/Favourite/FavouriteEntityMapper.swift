@@ -7,32 +7,30 @@
 
 import Foundation
 
-struct FavouriteEntityMapper {
-	
-	// MARK: - Domain to Entity
-	func toEntity(from movie: Movie) -> FavouriteMovieEntity {
-		print("🔄 [Mapper] Converting Movie to Entity: \(movie.title) (ID: \(movie.id))")
-		
-		return FavouriteMovieEntity(
-			id: movie.id,
-			title: movie.title,
-			overview: movie.overview,
-			popularity: movie.popularity,
-			posterPath: movie.posterPath,
-			releaseDate: movie.releaseDate,
-			voteAverage: movie.voteAverage,
-			genreIDS: movie.genreIDS ?? [],
-			backdropPath: movie.backdropPath,
-			runtime: movie.runtime,
+struct FavouriteEntityMapper: EntityMapper {
+	typealias DomainModel = Movie
+	typealias EntityModel = FavouriteMovieEntity
+
+	// MARK: - EntityMapper
+
+	func toEntity(_ domain: Movie) throws -> FavouriteMovieEntity {
+		FavouriteMovieEntity(
+			id: domain.id,
+			title: domain.title,
+			overview: domain.overview,
+			popularity: domain.popularity,
+			posterPath: domain.posterPath,
+			releaseDate: domain.releaseDate,
+			voteAverage: domain.voteAverage,
+			genreIDS: domain.genreIDS ?? [],
+			backdropPath: domain.backdropPath,
+			runtime: domain.runtime,
 			createdAt: Date()
 		)
 	}
-	
-	// MARK: - Entity to Domain
-	func toDomain(from entity: FavouriteMovieEntity) -> Movie {
-		print("🔄 [Mapper] Converting Entity to Movie: \(entity.title) (ID: \(entity.id))")
-		
-		return Movie(
+
+	func toDomain(_ entity: FavouriteMovieEntity) throws -> Movie {
+		Movie(
 			id: entity.id,
 			title: entity.title,
 			overview: entity.overview,

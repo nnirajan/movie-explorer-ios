@@ -19,7 +19,7 @@ final class RequestBuilder {
 		let url = baseURL.appending(path: request.path)
 		
 		var urlRequest = URLRequest(url: url)
-		urlRequest.httpMethod = request.method.rawValue
+		urlRequest.httpMethod = request.method.identifier
 		urlRequest.timeoutInterval = request.timeoutInterval
 		
 		// Apply default headers

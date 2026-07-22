@@ -23,13 +23,14 @@ struct ViewError: Equatable {
 @Observable
 class BaseViewModel {
 	var state: ViewState = .idle
+	/// Set to true in a subclass init to prevent BaseView from triggering loadData automatically.
+	var skipInitialLoad: Bool = false
 
 	init() {
 		debugPrint("Initialized --> \(type(of: self))")
 	}
 
 	deinit {
-		NotificationCenter.default.removeObserver(self)
 		debugPrint("De-Initialized --> \(type(of: self))")
 	}
 

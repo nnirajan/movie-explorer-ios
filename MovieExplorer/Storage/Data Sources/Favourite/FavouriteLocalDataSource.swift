@@ -47,6 +47,7 @@ final class FavouriteLocalDataSource {
 		print("✅ All favourites: \(all.map { "\($0.title) (ID: \($0.id))" })")
 	}
 
+	@MainActor
 	func deleteFavourite(byId id: Int) async throws {
 		guard let entity = try await fetchFavourite(byId: id) else {
 			print("⚠️ No favourite found with ID: \(id)")
