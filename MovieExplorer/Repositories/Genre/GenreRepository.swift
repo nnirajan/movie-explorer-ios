@@ -8,7 +8,7 @@
 import Foundation
 
 protocol GenreRepository {
-	func getGenres(request: NetworkRequest) async throws -> GenreReponse
+	func getGenres(request: NetworkRequest) async throws -> GenreResponse
 }
 
 class GenreRepositoryImpl: GenreRepository {
@@ -29,16 +29,16 @@ class GenreRepositoryImpl: GenreRepository {
 	/// 1. Try to fetch from network
 	/// 2. If successful, cache the data
 	/// 3. If network fails, return cached data (offline support)
-	func getGenres(request: NetworkRequest) async throws -> GenreReponse {
+	func getGenres(request: NetworkRequest) async throws -> GenreResponse {
 		do {
-			let response: GenreReponse = try await networkClient.execute(request)
+			let response: GenreResponse = try await networkClient.execute(request)
 			try? await localRepository.saveGenres(response.genres)
 			return response
 		} catch {
 			if let cachedGenres = try? await localRepository.fetchGenres(),
 			   !cachedGenres.isEmpty {
 				print("📦 Network failed, using cached genres")
-				return GenreReponse(genres: cachedGenres)
+				return GenreResponse(genres: cachedGenres)
 			}
 			
 			throw error

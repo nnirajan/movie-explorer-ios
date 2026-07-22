@@ -1,12 +1,12 @@
 //
-//  GenreReponse.swift
+//  GenreResponse.swift
 //  MovieExplorer
 //
 //  Created by Nirajan Shrestha on 24/01/2026.
 //
 
-// MARK: - GenreReponse
-struct GenreReponse: Codable {
+// MARK: - GenreResponse
+struct GenreResponse: Codable {
 	let genres: [Genre]
 
 	init(from decoder: any Decoder) throws {
@@ -15,7 +15,7 @@ struct GenreReponse: Codable {
 	}
 }
 
-extension GenreReponse {
+extension GenreResponse {
 	init(genres: [Genre]) {
 		self.genres = genres
 	}

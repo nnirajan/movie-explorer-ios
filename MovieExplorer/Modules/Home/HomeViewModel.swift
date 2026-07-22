@@ -66,7 +66,7 @@ class HomeViewModel: BaseViewModel {
 	
 	// MARK: - getGenres
 	@MainActor
-	func getGenres() async throws -> GenreReponse {
+	func getGenres() async throws -> GenreResponse {
 		try await genreRepository.getGenres(request: GenreRequest.genre)
 	}
 	
