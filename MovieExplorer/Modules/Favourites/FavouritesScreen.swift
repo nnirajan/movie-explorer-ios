@@ -51,8 +51,9 @@ struct FavouritesScreen: View {
 	}
 }
 
-//#Preview {
-//	FavouritesScreen(
-//		viewModel: AppDependencyContainer.shared.makeFavouriteViewModel()
-//	)
-//}
+#Preview {
+	FavouritesScreen(
+		viewModel: AppDependencyContainer().makeFavouriteViewModel(),
+		router: Router()
+	)
+}

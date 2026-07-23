@@ -24,13 +24,15 @@ func configureKingfisher() {
 
 @main
 struct MovieExplorerApp: App {
+	private let container = AppDependencyContainer()
+
 	init() {
 		configureKingfisher()
 	}
-	
+
 	var body: some Scene {
 		WindowGroup {
-			DashboardScreen()
+			DashboardScreen(container: container)
 		}
 	}
 }

@@ -47,9 +47,14 @@ enum DashboardRoute: Route {
 }
 
 struct DashboardScreen: View {
+	private let container: AppDependencyContainer
+
 	@State private var tabSelection: DashboardTab = .home
-	
 	@State private var dashboardRouter = Router<DashboardRoute>()
+
+	init(container: AppDependencyContainer) {
+		self.container = container
+	}
 	
 	var navigationTitle: String {
 		tabSelection == .home ? "" : "Favourites"
@@ -66,7 +71,7 @@ struct DashboardScreen: View {
 						value: .home,
 						content: {
 							HomeScreen(
-								viewModel: AppDependencyContainer.shared.makeHomeViewModel(),
+								viewModel: container.makeHomeViewModel(),
 								router: dashboardRouter
 							)
 						}
@@ -78,7 +83,7 @@ struct DashboardScreen: View {
 						value: .favourites,
 						content: {
 							FavouritesScreen(
-								viewModel: AppDependencyContainer.shared.makeFavouriteViewModel(),
+								viewModel: container.makeFavouriteViewModel(),
 								router: dashboardRouter
 							)
 						}
@@ -115,12 +120,12 @@ struct DashboardScreen: View {
 			
 		case .movieDetail(let id):
 			DetailScreen(
-				viewModel: AppDependencyContainer.shared.makeDetailViewModel(movieID: id)
+				viewModel: container.makeDetailViewModel(movieID: id)
 			)
 			
 		case .search:
 			SearchScreen(
-				viewModel: AppDependencyContainer.shared.makeSearchViewModel(),
+				viewModel: container.makeSearchViewModel(),
 				router: router
 			)
 		}
@@ -128,5 +133,5 @@ struct DashboardScreen: View {
 }
 
 #Preview {
-	DashboardScreen()
+	DashboardScreen(container: AppDependencyContainer())
 }

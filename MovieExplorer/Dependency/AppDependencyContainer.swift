@@ -15,9 +15,6 @@ protocol DependencyContainer {
 
 // MARK: - AppDependencyContainer
 final class AppDependencyContainer: DependencyContainer {
-	// MARK: - Singleton
-	static let shared = AppDependencyContainer()
-
 	// MARK: - Dependencies
 	private(set) lazy var networkClient: NetworkClientProtocol = {
 		NetworkClient(configuration: networkConfiguration)
@@ -63,7 +60,7 @@ final class AppDependencyContainer: DependencyContainer {
 	private let networkConfiguration: NetworkConfiguration
 
 	// MARK: - Initialization
-	private init() {
+	init() {
 		self.environment = BuildConfiguration.getAppEnvironment()
 
 		do {

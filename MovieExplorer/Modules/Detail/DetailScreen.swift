@@ -134,7 +134,7 @@ struct DetailScreen: View {
 // MARK: - Preview
 #Preview {
 	DetailScreen(
-		viewModel: AppDependencyContainer.shared.makeDetailViewModel(
+		viewModel: AppDependencyContainer().makeDetailViewModel(
 			movieID: 991494
 		)
 	)
