@@ -73,5 +73,5 @@ struct SearchScreen: View {
 }
 
 #Preview {
-	DashboardScreen()
+	DashboardScreen(container: AppDependencyContainer())
 }
