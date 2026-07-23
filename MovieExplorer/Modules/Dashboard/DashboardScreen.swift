@@ -8,25 +8,25 @@
 import SwiftUI
 
 enum DashboardTab: String {
-	case home, favorites
+	case home, favourites
 	
 	var title: String {
 		switch self {
 		case .home: return "Home"
-		case .favorites: return "Favourites"
+		case .favourites: return "Favourites"
 		}
 	}
 	
 	var icon: String {
 		switch self {
 		case .home: return "house.fill"
-		case .favorites: return "heart.fill"
+		case .favourites: return "heart.fill"
 		}
 	}
 }
 
 // Define routes for Home tab
-enum DashBoardRoute: Route {
+enum DashboardRoute: Route {
 	case home
 	case favourites
 	case movieDetail(id: Int)
@@ -49,7 +49,7 @@ enum DashBoardRoute: Route {
 struct DashboardScreen: View {
 	@State private var tabSelection: DashboardTab = .home
 	
-	@State private var dashboardRouter = Router<DashBoardRoute>()
+	@State private var dashboardRouter = Router<DashboardRoute>()
 	
 	var navigationTitle: String {
 		tabSelection == .home ? "" : "Favourites"
@@ -73,9 +73,9 @@ struct DashboardScreen: View {
 					)
 					
 					Tab(
-						DashboardTab.favorites.title,
-						systemImage: DashboardTab.favorites.icon,
-						value: .favorites,
+						DashboardTab.favourites.title,
+						systemImage: DashboardTab.favourites.icon,
+						value: .favourites,
 						content: {
 							FavouritesScreen(
 								viewModel: AppDependencyContainer.shared.makeFavouriteViewModel(),
@@ -105,7 +105,7 @@ struct DashboardScreen: View {
 	}
 	
 	@ViewBuilder
-	private func handleDashboardRoutes(for route: DashBoardRoute, router: Router<DashBoardRoute>) -> some View {
+	private func handleDashboardRoutes(for route: DashboardRoute, router: Router<DashboardRoute>) -> some View {
 		switch route {
 		case .home:
 			EmptyView()

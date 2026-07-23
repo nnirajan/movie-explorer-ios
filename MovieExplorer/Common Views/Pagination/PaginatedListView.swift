@@ -141,7 +141,6 @@ struct PlaceholderView: View {
 
 // MARK: - Searchable Protocol
 protocol Searchable: AnyObject {
-	associatedtype ResultType
 	var searchText: String { get set }
 	var searchState: SearchState { get set }
 	func handleSearchTextChange(_ newValue: String)

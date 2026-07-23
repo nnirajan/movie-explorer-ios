@@ -9,9 +9,9 @@ import SwiftUI
 
 struct SearchScreen: View {
 	@State private var viewModel: SearchViewModel
-	let router: Router<DashBoardRoute>
+	let router: Router<DashboardRoute>
 	
-	init(viewModel: SearchViewModel, router: Router<DashBoardRoute>) {
+	init(viewModel: SearchViewModel, router: Router<DashboardRoute>) {
 		self.viewModel = viewModel
 		self.router = router
 	}

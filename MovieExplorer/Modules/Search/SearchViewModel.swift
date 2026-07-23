@@ -8,9 +8,7 @@
 import Foundation
 
 @Observable
-class SearchViewModel: BaseViewModel, Searchable {
-	typealias ResultType = [Movie]
-	
+final class SearchViewModel: BaseViewModel, Searchable {
 	// MARK: - properties
 	private let searchRepository: SearchRepository
 	private var searchTask: Task<Void, Never>?
@@ -63,7 +61,7 @@ class SearchViewModel: BaseViewModel, Searchable {
 				"page": page
 			]
 			
-			let request = SearchRequest.searchMovie(params)
+			let request = SearchRequest.search(params)
 			let response = try await searchRepository.getSearchMovies(request: request)
 			
 			let newMovies = response.results

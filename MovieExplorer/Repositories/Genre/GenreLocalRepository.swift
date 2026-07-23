@@ -7,7 +7,13 @@
 
 import Foundation
 
-final class GenreLocalRepository {
+// MARK: - GenreStore
+protocol GenreStore {
+	func fetchGenres() async throws -> [Genre]
+	func saveGenres(_ genres: [Genre]) async throws
+}
+
+final class GenreStoreImpl: GenreStore {
 	// MARK: - Properties
 	private let dataSource: GenreLocalDataSource
 	private let mapper: GenreEntityMapper

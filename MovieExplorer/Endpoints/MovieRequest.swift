@@ -10,7 +10,7 @@ import Foundation
 enum MovieRequest: NetworkRequest {
 	case nowPlaying
 	case popular(Parameters)
-	case movieDetail(id: Int)
+	case detail(id: Int)
 	case credits(id: Int)
 	
 	var path: String {
@@ -19,7 +19,7 @@ enum MovieRequest: NetworkRequest {
 			"movie/now_playing"
 		case .popular:
 			"movie/popular"
-		case .movieDetail(let id):
+		case .detail(let id):
 			"movie/\(id)"
 		case .credits(let id):
 			"movie/\(id)/credits"
@@ -28,14 +28,14 @@ enum MovieRequest: NetworkRequest {
 	
 	var method: HTTPMethod {
 		switch self {
-		case .nowPlaying, .popular, .movieDetail, .credits:
+		case .nowPlaying, .popular, .detail, .credits:
 			return .get
 		}
 	}
 	
 	var encoders: [EncoderType] {
 		switch self {
-		case .nowPlaying, .movieDetail, .credits:
+		case .nowPlaying, .detail, .credits:
 			[]
 		case .popular(let params):
 			[.url(params)]

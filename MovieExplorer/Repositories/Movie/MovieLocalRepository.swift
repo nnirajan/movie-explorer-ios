@@ -7,7 +7,17 @@
 
 import Foundation
 
-final class MovieLocalRepository {
+// MARK: - MovieStore
+protocol MovieStore {
+	func fetchMovies(byCategory category: MovieCategory) async throws -> [Movie]
+	func replaceMovies(_ movies: [Movie], category: MovieCategory) async throws
+	func saveMovies(_ movies: [Movie], category: MovieCategory) async throws
+	func saveMovie(_ movie: Movie, category: MovieCategory) async throws
+	func deleteMovies(byCategory category: MovieCategory) async throws
+	func clearMovies() async throws
+}
+
+final class MovieStoreImpl: MovieStore {
 	// MARK: - Properties
 	private let dataSource: MovieLocalDataSource
 	private let mapper: MovieEntityMapper

@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable
-class DetailViewModel: BaseViewModel {
+final class DetailViewModel: BaseViewModel {
 	// MARK: - Properties
 	private let movieID: Int
 	private let movieRepository: MovieRepository
@@ -48,7 +48,7 @@ class DetailViewModel: BaseViewModel {
 	@MainActor
 	private func loadMovieDetail() async {
 		do {
-			let request = MovieRequest.movieDetail(id: movieID)
+			let request = MovieRequest.detail(id: movieID)
 			async let detailTask = movieRepository.getMovieDetail(request: request)
 			async let favouriteTask = favouriteRepository.isFavourite(movieId: movieID)
 			let (movie, isFavourite) = try await (detailTask, favouriteTask)

@@ -9,18 +9,18 @@ protocol SearchRepository {
 	func getSearchMovies(request: NetworkRequest) async throws -> MovieResponse
 }
 
-class SearchRepositoryImpl: SearchRepository {
+final class SearchRepositoryImpl: SearchRepository {
 	// MARK: - properties
 	private let networkClient: NetworkClientProtocol
-	
+
 	// MARK: - init
 	init(
 		networkClient: NetworkClientProtocol
 	) {
 		self.networkClient = networkClient
 	}
-	
-	// MARK: - getNowPlayingMovies
+
+	// MARK: - getSearchMovies
 	func getSearchMovies(request: NetworkRequest) async throws -> MovieResponse {
 		return try await networkClient.execute(request)
 	}

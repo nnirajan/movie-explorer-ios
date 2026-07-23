@@ -6,25 +6,25 @@
 //
 
 enum SearchRequest: NetworkRequest {
-	case searchMovie(Parameters)
+	case search(Parameters)
 	
 	var path: String {
 		switch self {
-		case .searchMovie:
+		case .search:
 			"search/movie"
 		}
 	}
 	
 	var method: HTTPMethod {
 		switch self {
-		case .searchMovie:
+		case .search:
 			return .get
 		}
 	}
 	
 	var encoders: [EncoderType] {
 		switch self {
-		case .searchMovie(let params):
+		case .search(let params):
 			[.url(params)]
 		}
 	}

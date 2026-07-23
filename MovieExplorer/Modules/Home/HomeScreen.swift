@@ -11,12 +11,12 @@ struct HomeScreen: View {
 	// MARK: - properties
 	@State private var viewModel: HomeViewModel
 	
-	let router: Router<DashBoardRoute>
+	let router: Router<DashboardRoute>
 	
 	// MARK: - initialization
 	init(
 		viewModel: HomeViewModel,
-		router: Router<DashBoardRoute>
+		router: Router<DashboardRoute>
 	) {
 		self.viewModel = viewModel
 		self.router = router

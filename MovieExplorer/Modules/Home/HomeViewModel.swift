@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable
-class HomeViewModel: BaseViewModel {
+final class HomeViewModel: BaseViewModel {
 	// MARK: - properties
 	private let movieRepository: MovieRepository
 	private let genreRepository: GenreRepository

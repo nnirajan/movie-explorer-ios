@@ -11,18 +11,18 @@ protocol GenreRepository {
 	func getGenres(request: NetworkRequest) async throws -> GenreResponse
 }
 
-class GenreRepositoryImpl: GenreRepository {
+final class GenreRepositoryImpl: GenreRepository {
 	// MARK: - Properties
 	private let networkClient: NetworkClientProtocol
-	private let localRepository: GenreLocalRepository
-	
+	private let store: GenreStore
+
 	// MARK: - Initialization
 	init(
 		networkClient: NetworkClientProtocol,
-		localRepository: GenreLocalRepository
+		store: GenreStore
 	) {
 		self.networkClient = networkClient
-		self.localRepository = localRepository
+		self.store = store
 	}
 	
 	// MARK: - getGenres
@@ -32,10 +32,10 @@ class GenreRepositoryImpl: GenreRepository {
 	func getGenres(request: NetworkRequest) async throws -> GenreResponse {
 		do {
 			let response: GenreResponse = try await networkClient.execute(request)
-			try? await localRepository.saveGenres(response.genres)
+			try? await store.saveGenres(response.genres)
 			return response
 		} catch {
-			if let cachedGenres = try? await localRepository.fetchGenres(),
+			if let cachedGenres = try? await store.fetchGenres(),
 			   !cachedGenres.isEmpty {
 				print("📦 Network failed, using cached genres")
 				return GenreResponse(genres: cachedGenres)

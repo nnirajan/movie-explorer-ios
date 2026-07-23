@@ -23,7 +23,7 @@ protocol NetworkRequest {
 	var encoders: [EncoderType] { get }
 	
 	/// The base URL to override if need be
-	var overridenBaseURL: String? { get }
+	var overriddenBaseURL: String? { get }
 	
 	var timeoutInterval: TimeInterval { get }
 }
@@ -31,6 +31,6 @@ protocol NetworkRequest {
 /// Deafult implementations
 extension NetworkRequest {
 	var headers: HTTPHeaders? { nil }
-	var overridenBaseURL: String? { nil }
+	var overriddenBaseURL: String? { nil }
 	var timeoutInterval: TimeInterval { 60 }
 }

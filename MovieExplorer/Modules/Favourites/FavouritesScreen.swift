@@ -9,11 +9,11 @@ import SwiftUI
 
 struct FavouritesScreen: View {
 	@State private var viewModel: FavouriteViewModel
-	let router: Router<DashBoardRoute>
+	let router: Router<DashboardRoute>
 	
 	init(
 		viewModel: FavouriteViewModel,
-		router: Router<DashBoardRoute>
+		router: Router<DashboardRoute>
 	) {
 		self.viewModel = viewModel
 		self.router = router
