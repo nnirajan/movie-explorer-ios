@@ -7,13 +7,10 @@
 
 import Foundation
 
-struct FavouriteEntityMapper: EntityMapper {
-	typealias DomainModel = Movie
-	typealias EntityModel = FavouriteMovieEntity
-
-	// MARK: - EntityMapper
-
-	func toEntity(_ domain: Movie) throws -> FavouriteMovieEntity {
+// MARK: - FavouriteEntityMapper
+enum FavouriteEntityMapper {
+	// MARK: - Mapping
+	static func toEntity(_ domain: Movie) -> FavouriteMovieEntity {
 		FavouriteMovieEntity(
 			id: domain.id,
 			title: domain.title,
@@ -29,7 +26,7 @@ struct FavouriteEntityMapper: EntityMapper {
 		)
 	}
 
-	func toDomain(_ entity: FavouriteMovieEntity) throws -> Movie {
+	static func toDomain(_ entity: FavouriteMovieEntity) -> Movie {
 		Movie(
 			id: entity.id,
 			title: entity.title,
@@ -42,5 +39,13 @@ struct FavouriteEntityMapper: EntityMapper {
 			backdropPath: entity.backdropPath,
 			runtime: entity.runtime
 		)
+	}
+
+	static func toEntities(_ domains: [Movie]) -> [FavouriteMovieEntity] {
+		domains.map { toEntity($0) }
+	}
+
+	static func toDomains(_ entities: [FavouriteMovieEntity]) -> [Movie] {
+		entities.map { toDomain($0) }
 	}
 }

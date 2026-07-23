@@ -1,6 +1,8 @@
 //
-//  FavouriteLocalRepository.swift
+//  FavouriteStore.swift
 //  MovieExplorer
+//
+//  Created by Nirajan Shrestha on 25/01/2026.
 //
 
 import Foundation
@@ -16,26 +18,22 @@ protocol FavouriteStore {
 // MARK: - FavouriteStoreImpl
 final class FavouriteStoreImpl: FavouriteStore {
 	// MARK: - Properties
-	private let dataSource: FavouriteLocalDataSource
-	private let mapper: FavouriteEntityMapper
+	private let dataSource: FavouriteDataSource
 
 	// MARK: - Initialization
-	init(
-		dataSource: FavouriteLocalDataSource,
-		mapper: FavouriteEntityMapper = FavouriteEntityMapper()
-	) {
+	init(dataSource: FavouriteDataSource) {
 		self.dataSource = dataSource
-		self.mapper = mapper
 	}
 
 	// MARK: - FavouriteStore
 	func fetchFavourites() async throws -> [Movie] {
 		let entities = try await dataSource.fetchAllFavourites()
-		return try mapper.toDomains(entities)
+		return FavouriteEntityMapper.toDomains(entities)
 	}
 
 	func saveFavourite(_ movie: Movie) async throws {
-		let entity = try mapper.toEntity(movie)
+		guard !(await isFavourite(movieId: movie.id)) else { return }
+		let entity = FavouriteEntityMapper.toEntity(movie)
 		try await dataSource.saveFavourite(entity)
 	}
 

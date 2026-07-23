@@ -84,7 +84,7 @@ extension AppDependencyContainer {
 		GenreRepositoryImpl(
 			networkClient: networkClient,
 			store: GenreStoreImpl(
-				dataSource: GenreLocalDataSource(
+				dataSource: GenreDataSourceImpl(
 					modelContainer: modelContainer
 				)
 			)
@@ -95,7 +95,7 @@ extension AppDependencyContainer {
 		MovieRepositoryImpl(
 			networkClient: networkClient,
 			store: MovieStoreImpl(
-				dataSource: MovieLocalDataSource(
+				dataSource: MovieDataSourceImpl(
 					modelContainer: modelContainer
 				)
 			)
@@ -109,7 +109,7 @@ extension AppDependencyContainer {
 	func makeFavouriteRepository() -> FavouriteRepository {
 		FavouriteRepositoryImpl(
 			store: FavouriteStoreImpl(
-				dataSource: FavouriteLocalDataSource(
+				dataSource: FavouriteDataSourceImpl(
 					modelContainer: modelContainer
 				)
 			)

@@ -28,7 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		083C249B2F20E5C40090A79F /* MovieExplorer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MovieExplorer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		083C249B2F20E5C40090A79F /* Movie Explorer Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Movie Explorer Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		083C24AA2F20E5C60090A79F /* MovieExplorerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MovieExplorerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		083C24B42F20E5C60090A79F /* MovieExplorerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MovieExplorerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -103,7 +103,7 @@
 		083C249C2F20E5C40090A79F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				083C249B2F20E5C40090A79F /* MovieExplorer.app */,
+				083C249B2F20E5C40090A79F /* Movie Explorer Dev.app */,
 				083C24AA2F20E5C60090A79F /* MovieExplorerTests.xctest */,
 				083C24B42F20E5C60090A79F /* MovieExplorerUITests.xctest */,
 			);
@@ -134,7 +134,7 @@
 				08099F322F23E2BD004D2E35 /* Kingfisher */,
 			);
 			productName = MovieExplorer;
-			productReference = 083C249B2F20E5C40090A79F /* MovieExplorer.app */;
+			productReference = 083C249B2F20E5C40090A79F /* Movie Explorer Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 		083C24A92F20E5C60090A79F /* MovieExplorerTests */ = {

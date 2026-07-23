@@ -7,18 +7,10 @@
 
 import Foundation
 
-struct MovieEntityMapper: EntityMapper {
-	typealias DomainModel = Movie
-	typealias EntityModel = MovieEntity
-
-	// MARK: - EntityMapper Implementation
-
-	func toEntity(_ domain: Movie) throws -> MovieEntity {
-		// Category is always required — use toEntity(_:category:) instead.
-		throw StorageError.mappingFailed(reason: "MovieEntityMapper requires a category. Use toEntity(_:category:).")
-	}
-
-	func toEntity(_ domain: Movie, category: MovieCategory) throws -> MovieEntity {
+// MARK: - MovieEntityMapper
+enum MovieEntityMapper {
+	// MARK: - Domain to Entity
+	static func toEntity(_ domain: Movie, category: MovieCategory) -> MovieEntity {
 		MovieEntity(
 			movieId: domain.id,
 			title: domain.title,
@@ -34,11 +26,12 @@ struct MovieEntityMapper: EntityMapper {
 		)
 	}
 
-	func toEntities(_ domains: [Movie], category: MovieCategory) throws -> [MovieEntity] {
-		try domains.map { try toEntity($0, category: category) }
+	static func toEntities(_ domains: [Movie], category: MovieCategory) -> [MovieEntity] {
+		domains.map { toEntity($0, category: category) }
 	}
 
-	func toDomain(_ entity: MovieEntity) throws -> Movie {
+	// MARK: - Entity to Domain
+	static func toDomain(_ entity: MovieEntity) -> Movie {
 		Movie(
 			id: entity.movieId,
 			title: entity.title,
@@ -51,5 +44,9 @@ struct MovieEntityMapper: EntityMapper {
 			backdropPath: entity.backdropPath,
 			runtime: entity.runtime
 		)
+	}
+
+	static func toDomains(_ entities: [MovieEntity]) -> [Movie] {
+		entities.map { toDomain($0) }
 	}
 }
