@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "083C249A2F20E5C40090A79F"
-               BuildableName = "Movie Explorer Dev.app"
+               BuildableName = "MovieExplorer.app"
                BlueprintName = "MovieExplorer"
                ReferencedContainer = "container:MovieExplorer.xcodeproj">
             </BuildableReference>
@@ -35,14 +35,14 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "083C24A92F20E5C60090A79F"
+               BlueprintIdentifier = "9BC491F0301317C9002D38CB"
                BuildableName = "MovieExplorerTests.xctest"
                BlueprintName = "MovieExplorerTests"
                ReferencedContainer = "container:MovieExplorer.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "NO"
+            skipped = "YES"
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
@@ -69,7 +69,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "083C249A2F20E5C40090A79F"
-            BuildableName = "Movie Explorer Dev.app"
+            BuildableName = "MovieExplorer.app"
             BlueprintName = "MovieExplorer"
             ReferencedContainer = "container:MovieExplorer.xcodeproj">
          </BuildableReference>
@@ -86,7 +86,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "083C249A2F20E5C40090A79F"
-            BuildableName = "Movie Explorer Dev.app"
+            BuildableName = "MovieExplorer.app"
             BlueprintName = "MovieExplorer"
             ReferencedContainer = "container:MovieExplorer.xcodeproj">
          </BuildableReference>

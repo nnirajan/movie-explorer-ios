@@ -10,5 +10,5 @@
 
 #include "Base.xcconfig"
 
-TARGET_NAME = Movie Explorer
+APP_DISPLAY_NAME = Movie Explorer
 APP_ENV = PROD
